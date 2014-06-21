@@ -78,7 +78,6 @@ get_pops <- function(dF, cutoff, params, bins, nCellCutoff, markers){
       print("Sufficient populations cannot be identified by flowClean")
     }
   }
-
   aphbit <- poplist$aphbit
   lengths <- poplist$lengths
   idx <- poplist$idx
@@ -111,14 +110,17 @@ clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, nCellCu
   markers <- as.vector(markers)
 
   numbins <- 1/binSize
-  numOfEvents <- length(exprs(fF$Time))
-  lTime <- exprs(fF$Time)[numOfEvents]
+  time <- exprs(fF$Time)
+  # make sure time starts at 0
+  if (min(time) > 0){ time <- time - min(time) }
+  numOfEvents <- length(time)
+  lTime <- time[numOfEvents]
   stepB <- lTime * binSize
   bins <- lapply(c(1:numbins), function(i, x, y, z){
     vec <- which(x >= ((i - 1) * y) & (x < i * y))
     if (i == z){ vec <- c(vec, which(x >= (i * y))) }
     return(vec)
-  }, x=exprs(fF$Time), y=stepB, z=numbins )
+  }, x=time, y=stepB, z=numbins )
   binVector <- unlist(lapply(c(1:numbins), function(i, x){ rep(i, length(unlist(x[[i]]))) }, x=bins))
 
   out <- get_pops(exprs(fF), cutoff, params=vectMarkers, bins=bins, nCellCutoff, markers[vectMarkers])
