@@ -133,7 +133,7 @@ clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, nCellCu
   pts <- cpt.mean(norms, method="PELT", penalty="AIC")
 
   bad <- getBad(pts)
-  if (!is.null(bad)){
+  if (bad  != 0){
     if (bad[length(bad)] != numbins){
         bad <- c(bad, bad[length(bad)] + 1)
     }
