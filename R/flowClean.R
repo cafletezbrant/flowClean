@@ -133,7 +133,7 @@ clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, nCellCu
   pts <- cpt.mean(norms, method="PELT", penalty="AIC")
 
   bad <- getBad(pts)
-  if (bad  != 0){
+  if (!is.null(bad)){
     if (bad[length(bad)] != numbins){
         bad <- c(bad, bad[length(bad)] + 1)
     }
@@ -227,7 +227,7 @@ cen.log.ratio <- function(dF, minim=1e-7){
 
 getBad <- function(cpt, k=1.3){
     if (length(cpts(cpt)) == 0) {
-        bad <- 0
+        bad <- NULL
         return(bad)
     }
     ps <- ps2 <- cpts(cpt)
