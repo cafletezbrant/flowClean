@@ -129,7 +129,7 @@ clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, nCellCu
 
   out <- cen.log.ratio(out)
   dxVector <- binVector
-  norms <- lp(out, p=3)
+  norms <- lp(out)
   pts <- cpt.mean(norms, method="PELT", penalty="AIC")
 
   bad <- getBad(pts)

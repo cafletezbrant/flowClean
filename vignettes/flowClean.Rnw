@@ -86,7 +86,7 @@ To avoid \Robject{-Inf} values, substitution of zeroes is performed using the 'm
 \cite{zerosub}.
 
 The $L_p$ norm of the subset $CLR(D_j) > 0$, denoted $L_p = \|CLR(D_j)\|^+$, where 
-$p = 3$ has been found to work well, is then calculated for each $D_j$ and changepoint analysis 
+$p = |CLR(D_j) > 0|$, is then calculated for each $D_j$ and changepoint analysis 
 is performed on the set of all $\|CLR(D_j)\|^+$.  If there are no changes then the FCS is assumed 
 to contain no errors.  Otherwise, the means of the periods are compared relative to the mean of the longest period
 between changepoints and thresholded according to some $k$, which empirically works well with $k = 1.3$.
