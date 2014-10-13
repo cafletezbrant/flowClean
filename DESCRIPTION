@@ -1,0 +1,12 @@
+Package: flowClean
+Version: 1.2.0
+Title: flowClean
+Description: A quality control tool for flow cytometry data based on compositional data analysis.
+Author: Kipper Fletez-Brant
+Maintainer: Kipper Fletez-Brant <cafletezbrant@gmail.com>
+Depends: R (>= 2.15.0), flowCore
+Imports: bit, changepoint, sfsmisc 
+Suggests: flowViz, grid, gridExtra
+License: Artistic-2.0
+LazyLoad: yes
+biocViews: FlowCytometry, QualityControl
