@@ -1,9 +1,5 @@
 Package: flowClean
-<<<<<<< HEAD
-Version: 1.0.5
-=======
-Version: 1.3.0
->>>>>>> 1c847aafb16c4a8d123063118245255ce7a9bf06
+Version: 1.3.1
 Title: flowClean
 Description: A quality control tool for flow cytometry data based on compositional data analysis.
 Author: Kipper Fletez-Brant
