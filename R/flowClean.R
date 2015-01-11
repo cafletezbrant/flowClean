@@ -158,6 +158,9 @@ clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, nCellCu
     if (announce){
         print(paste("flowClean detected no problems in ", description(fF)$FILENAME, ".", sep=""))
     }
+    GoodVsBad <- as.numeric(dxVector)
+    outFCS <- makeFCS(fF, GoodVsBad, filePrefixWithDir, numbins, nCellCutoff, ext)
+    return(outFCS)
   } 
 }
 
