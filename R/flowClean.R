@@ -99,8 +99,8 @@ get_pops <- function(dF, cutoff, params, bins, nCellCutoff, markers){
   return(list("full"=perdf, "trim"=perdf.trim))
 }
 
-clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, nCellCutoff=500,
- announce=TRUE, cutoff="median", diagnostic=FALSE, fcMax=1.3){
+clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, type="type", nCellCutoff=500,
+ announce=TRUE, cutoff="median", diagnostic=FALSE, popMax=1.3, rateMax=3){
 
   if (dim(exprs(fF))[1] < 30000){
       warning("Too few cells in FCS for flowClean.")
@@ -121,18 +121,34 @@ clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, nCellCu
     if (i == z){ vec <- c(vec, which(x >= (i * y))) }
     return(vec)
   }, x=time, y=stepB, z=numbins )
+  bin.chi <- sapply(bins, function(xx){
+      ee <- numOfEvents * binSize
+      chi <- (length(xx) - ee)^2/ee
+      chi
+  })
+  if (length(grep("time|both", type)) == 1){
+      binBad <- getBad(cpt.mean(bin.chi), rateMax)
+  }    
   binVector <- unlist(lapply(c(1:numbins), function(i, x){ rep(i, length(unlist(x[[i]]))) }, x=bins))
 
   out <- get_pops(exprs(fF), cutoff, params=vectMarkers, bins=bins, nCellCutoff, markers[vectMarkers])
   full <- out$full
   out <- out$trim
+  if (length(grep("pops|both", type)) == 1){
+      out <- cen.log.ratio(out)
+      dxVector <- binVector
+      norms <- lp(out)
+      pts <- cpt.mean(norms, method="PELT", penalty="AIC")
+      popBad <- getBad(pts, popMax)
+  }
+  ## what kind of bad do we report?
+  bad <- NULL
+  ifelse(grep("both", type),
+         (bad <- union(binBad, popBad)),
+         ifelse(grep("pops", type),
+                (bad <- popBad),
+                (bad <- binBad)))
 
-  out <- cen.log.ratio(out)
-  dxVector <- binVector
-  norms <- lp(out)
-  pts <- cpt.mean(norms, method="PELT", penalty="AIC")
-
-  bad <- getBad(pts)
   if (!is.null(bad)){
     if (bad[length(bad)] != numbins){
         bad <- c(bad, bad[length(bad)] + 1)
@@ -150,7 +166,7 @@ clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, nCellCu
     outFCS <- makeFCS(fF, GoodVsBad, filePrefixWithDir, numbins, nCellCutoff, ext) 
     
     if (announce){
-      print(paste("flowClean has identified problems in ", description(fF)$FILENAME, ".", sep=""))
+      print(paste("flowClean has identified problems in ", description(fF)$FILENAME, " with ", toString(bad),  ".", sep=""))
     }
     return(outFCS)
   }
@@ -158,6 +174,13 @@ clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, nCellCu
     if (announce){
         print(paste("flowClean detected no problems in ", description(fF)$FILENAME, ".", sep=""))
     }
+      if (diagnostic){
+      png(paste(filePrefixWithDir,sep=".", numbins, nCellCutoff, "clr_percent_plot", "png"), type="cairo",
+          height=1000, width=1000)
+      diagnosticPlot(out,"CLR", bad)
+      dev.off()
+  }
+
     GoodVsBad <- as.numeric(dxVector)
     outFCS <- makeFCS(fF, GoodVsBad, filePrefixWithDir, numbins, nCellCutoff, ext)
     return(outFCS)
