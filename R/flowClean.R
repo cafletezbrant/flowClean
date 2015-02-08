@@ -99,7 +99,7 @@ get_pops <- function(dF, cutoff, params, bins, nCellCutoff, markers){
   return(list("full"=perdf, "trim"=perdf.trim))
 }
 
-clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, type="type", nCellCutoff=500,
+clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, type="pops", nCellCutoff=500,
  announce=TRUE, cutoff="median", diagnostic=FALSE, popMax=1.3, rateMax=3){
 
   if (dim(exprs(fF))[1] < 30000){
@@ -121,33 +121,32 @@ clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, type="t
     if (i == z){ vec <- c(vec, which(x >= (i * y))) }
     return(vec)
   }, x=time, y=stepB, z=numbins )
-  bin.chi <- sapply(bins, function(xx){
+  bin.dev <- sapply(bins, function(xx){
       ee <- numOfEvents * binSize
-      chi <- (length(xx) - ee)^2/ee
-      chi
+      dev <- (length(xx) - ee)^2
+      dev
   })
   if (length(grep("time|both", type)) == 1){
-      binBad <- getBad(cpt.mean(bin.chi), rateMax)
+      binBad <- getBad(cpt.mean(bin.dev), rateMax)
   }    
   binVector <- unlist(lapply(c(1:numbins), function(i, x){ rep(i, length(unlist(x[[i]]))) }, x=bins))
 
   out <- get_pops(exprs(fF), cutoff, params=vectMarkers, bins=bins, nCellCutoff, markers[vectMarkers])
   full <- out$full
   out <- out$trim
+  dxVector <- binVector
   if (length(grep("pops|both", type)) == 1){
       out <- cen.log.ratio(out)
-      dxVector <- binVector
       norms <- lp(out)
       pts <- cpt.mean(norms, method="PELT", penalty="AIC")
       popBad <- getBad(pts, popMax)
   }
   ## what kind of bad do we report?
   bad <- NULL
-  ifelse(grep("both", type),
-         (bad <- union(binBad, popBad)),
-         ifelse(grep("pops", type),
-                (bad <- popBad),
-                (bad <- binBad)))
+  if (type == "both"){ bad <- sort(union(binBad, popBad)) }
+  else if (type == "pops"){ bad <- popBad }
+  else if (type == "time"){ bad <- binBad }
+  else { stop("Type of QC not one of both, pops, time") }
 
   if (!is.null(bad)){
     if (bad[length(bad)] != numbins){
