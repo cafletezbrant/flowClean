@@ -100,7 +100,7 @@ get_pops <- function(dF, cutoff, params, bins, nCellCutoff, markers){
 }
 
 clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, type="pops", nCellCutoff=500,
- announce=TRUE, cutoff="median", diagnostic=FALSE, popMax=1.3, rateMax=3){
+ announce=TRUE, cutoff="median"){
 
   if (dim(exprs(fF))[1] < 30000){
       warning("Too few cells in FCS for flowClean.")
@@ -121,33 +121,18 @@ clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, type="p
     if (i == z){ vec <- c(vec, which(x >= (i * y))) }
     return(vec)
   }, x=time, y=stepB, z=numbins )
-  bin.dev <- sapply(bins, function(xx){
-      ee <- numOfEvents * binSize
-      dev <- (length(xx) - ee)^2
-      dev
-  })
-  if (length(grep("time|both", type)) == 1){
-      binBad <- getBad(cpt.mean(bin.dev), rateMax)
-  }    
   binVector <- unlist(lapply(c(1:numbins), function(i, x){ rep(i, length(unlist(x[[i]]))) }, x=bins))
 
   out <- get_pops(exprs(fF), cutoff, params=vectMarkers, bins=bins, nCellCutoff, markers[vectMarkers])
   full <- out$full
   out <- out$trim
   dxVector <- binVector
-  if (length(grep("pops|both", type)) == 1){
-      out <- cen.log.ratio(out)
-      norms <- lp(out)
-      pts <- cpt.mean(norms, method="PELT", penalty="AIC")
-      popBad <- getBad(pts, popMax)
-  }
-  ## what kind of bad do we report?
-  bad <- NULL
-  if (type == "both"){ bad <- sort(union(binBad, popBad)) }
-  else if (type == "pops"){ bad <- popBad }
-  else if (type == "time"){ bad <- binBad }
-  else { stop("Type of QC not one of both, pops, time") }
+  out <- cen.log.ratio(out)
+  norms <- lp(out)
+  pts <- cpt.mean(norms, method="PELT", penalty="AIC")
+  bad <- getBad(pts, popMax)
 
+  ## what kind of bad do we report?
   if (!is.null(bad)){
     if (bad[length(bad)] != numbins){
         bad <- c(bad, bad[length(bad)] + 1)
