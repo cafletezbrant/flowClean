@@ -130,7 +130,7 @@ clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, type="p
   out <- cen.log.ratio(out)
   norms <- lp(out)
   pts <- cpt.mean(norms, method="PELT", penalty="AIC")
-  bad <- getBad(pts, popMax)
+  bad <- getBad(pts)
 
   ## what kind of bad do we report?
   if (!is.null(bad)){
