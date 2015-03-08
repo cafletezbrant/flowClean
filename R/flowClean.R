@@ -99,7 +99,7 @@ get_pops <- function(dF, cutoff, params, bins, nCellCutoff, markers){
   return(list("full"=perdf, "trim"=perdf.trim))
 }
 
-clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, type="pops", nCellCutoff=500,
+clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, type="pops", nCellCutoff=500, diagnostic=TRUE, fcMax=1.3,
  announce=TRUE, cutoff="median"){
 
   if (dim(exprs(fF))[1] < 30000){
