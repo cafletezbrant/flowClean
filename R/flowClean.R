@@ -99,8 +99,7 @@ get_pops <- function(dF, cutoff, params, bins, nCellCutoff, markers){
   return(list("full"=perdf, "trim"=perdf.trim))
 }
 
-clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, type="pops", nCellCutoff=500, diagnostic=TRUE, fcMax=1.3,
- announce=TRUE, cutoff="median"){
+clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, nCellCutoff=500,  announce=TRUE, cutoff="median", diagnostic=FALSE, fcMax=1.3){
 
   if (dim(exprs(fF))[1] < 30000){
       warning("Too few cells in FCS for flowClean.")
@@ -158,12 +157,12 @@ clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, type="p
     if (announce){
         print(paste("flowClean detected no problems in ", description(fF)$FILENAME, ".", sep=""))
     }
-      if (diagnostic){
+    if (diagnostic){
       png(paste(filePrefixWithDir,sep=".", numbins, nCellCutoff, "clr_percent_plot", "png"), type="cairo",
           height=1000, width=1000)
       diagnosticPlot(out,"CLR", bad)
       dev.off()
-  }
+   }
 
     GoodVsBad <- as.numeric(dxVector)
     outFCS <- makeFCS(fF, GoodVsBad, filePrefixWithDir, numbins, nCellCutoff, ext)
