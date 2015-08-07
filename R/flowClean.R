@@ -99,7 +99,8 @@ get_pops <- function(dF, cutoff, params, bins, nCellCutoff, markers){
   return(list("full"=perdf, "trim"=perdf.trim))
 }
 
-clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, nCellCutoff=500,  announce=TRUE, cutoff="median", diagnostic=FALSE, fcMax=1.3){
+clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, nCellCutoff=500,
+                  announce=TRUE, cutoff="median", diagnostic=FALSE, fcMax=1.3, returnVector=FALSE){
 
   if (dim(exprs(fF))[1] < 30000){
       warning("Too few cells in FCS for flowClean.")
@@ -108,7 +109,7 @@ clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, nCellCu
   markers <- parameters(fF)$name
   markers <- as.vector(markers)
 
-  numbins <- 1/binSize
+  numbins <- ceiling(1/binSize)
   time <- exprs(fF$Time)
   # make sure time starts at 0
   if (min(time) > 0){ time <- time - min(time) }
@@ -138,7 +139,7 @@ clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, nCellCu
     }
     dxVector[which(dxVector %in% bad)] <- runif(length(which(dxVector %in% bad)), min=10000, max=20000)
     GoodVsBad <- as.numeric(dxVector)
-  
+    if (returnVector == TRUE){ return(GoodVsBad) }  
     if (diagnostic){
       png(paste(filePrefixWithDir,sep=".", numbins, nCellCutoff, "clr_percent_plot", "png"), type="cairo",
           height=1000, width=1000)
@@ -165,6 +166,7 @@ clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, nCellCu
    }
 
     GoodVsBad <- as.numeric(dxVector)
+    if (returnVector == TRUE){ return(GoodVsBad) }    
     outFCS <- makeFCS(fF, GoodVsBad, filePrefixWithDir, numbins, nCellCutoff, ext)
     return(outFCS)
   } 
@@ -234,35 +236,83 @@ cen.log.ratio <- function(dF, minim=1e-7){
   return(rev_df)
 }
 
+getCPTs <- function(cpt){
+    methodFound <- slotFound <- FALSE
+    out <- NULL
+    if (length(cpts(cpt)) > 0) {
+        methodFound <- TRUE
+        out <- cpts(cpt)
+    }
+    else if (length(cpt@cpts)){
+        slotFound <- TRUE
+        out <- cpt@cpts
+    }
+    if (methodFound | slotFound){ return(out) }
+    else { return(NULL) }
+}
+
 getBad <- function(cpt, k=1.3){
-    if (length(cpts(cpt)) == 0) {
+    pts <- getCPTs(cpt)
+    if (length(pts) == 0) {
         bad <- NULL
         return(bad)
     }
-    ps <- ps2 <- cpts(cpt)
+    ps <- ps2 <- pts
     ms <- param.est(cpt)$mean
     len <- length(data.set(cpt))
 
-    ## cpt only seems to call first as separate mean when first bin is very different
-    ## logic here is to assign means to sets of bins
-    if (ps2[[1]] != 1){
-        ps2 <- c(0, ps2)
-    }
-    if (ps2[[length(ps)]] != len){
-        ps2 <- c(ps2, len)
+    binList <- cl.iter(pts, len)
+
+    if (length(binList) > length(ms)){
+        ms <- lapply(binList, function(xx){ return( mean(data.set(cpt)[unlist(xx)]) ) })
     }
 
-    binList <- lapply(2:length(ps2), function(ii){       
-            n <- (ps2[[ii - 1]] + 1):ps2[[ii]]
-    })
-    if (ps[1] == 1){ binList <- c(list(1), binList) }
-    
     lens <- sapply(binList, length)
     big <- ms[which(lens == max(lens))]
-    FCs <- ms/big
+    FCs <- unlist(ms)/as.numeric(big)
     bad <- binList[which(FCs > k)]
     unlist(bad)
 }
+
+bin.unlist <- function(bins){
+   cls <- lapply(bins, is.list)
+   bins2 <- list()
+   for (ii in 1:length(cls)){
+       if (cls[[ii]]){
+           vv <- lapply(bins[[ii]], unlist)
+           bins2 <- c(bins2, vv)
+       }
+       else { bins2 <- c(bins2, bins[ii]) }
+   }
+   bins2
+}
+
+cl.iter <- function(vectr, max.x){
+   bins <- lapply(vectr, cl, vectr=vectr, max.x=max.x)
+#   browser()
+   bins <- bin.unlist(bins)
+   bins
+}
+
+cl <- function(x, vectr, max.x){
+    id <- which(x == vectr)
+    ## if the first CPT is not 1, and the 2nd CPT is CPT.1 + 1, return 2 entries.
+    if (x == vectr[1] & vectr[1] != 1 & length(vectr) != 1){
+        if ((vectr[2] - x) == 1){ return(list(1:(x - 1),x)) }
+        else { return(1:x) }
+    }
+    if (x == vectr[length(vectr)]){
+        if (x != max.x){ return(x:max.x) }
+        else if (x == max.x & length(vectr) > 1){ return((vectr[id-1] + 1):x) }
+        else if (x == max.x & length(vectr) == 1){ return(list(unlist(1:(x-1)), unlist(x))) }
+        else { return(x) }
+    }
+    else{
+        if (abs(x - vectr[id+1]) == 1){ return(x) }
+        else { return(x:(vectr[id+1] - 1)) }
+    }
+}
+
 
 lp <- function(dF, p=NULL){
   xnorms <- apply(dF, 2, function(x){
