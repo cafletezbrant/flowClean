@@ -110,9 +110,13 @@ clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, nCellCu
   markers <- as.vector(markers)
 
   numbins <- ceiling(1/binSize)
-  time <- exprs(fF$Time)
   ## test for whether time exists - either at all or more than 1 value
-  if (mean(time) == time[1] | is.null(exprs(fF$Time))){ time <- 1:nrow(exprs(fF)) }
+  time.id <- grep("time", colnames(exprs(fF)), ignore.case=TRUE)
+  if (time.id > 0){
+      time <- exprs(fF)[,time.id]
+      if (mean(time) == time[1]){ time <- 1:nrow(exprs(fF)) }    
+  }
+  else { time <- 1:nrow(exprs(fF)) }
   # make sure time starts at 0
   if (min(time) > 0){ time <- time - min(time) }
   numOfEvents <- length(time)
