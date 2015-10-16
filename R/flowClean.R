@@ -112,7 +112,7 @@ clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, nCellCu
   numbins <- ceiling(1/binSize)
   ## test for whether time exists - either at all or more than 1 value
   time.id <- grep("time", colnames(exprs(fF)), ignore.case=TRUE)
-  if (time.id > 0){
+  if (length(time.id) > 0){
       time <- exprs(fF)[,time.id]
       if (mean(time) == time[1]){ time <- 1:nrow(exprs(fF)) }    
   }
