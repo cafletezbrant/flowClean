@@ -11,8 +11,8 @@ geo.mean <- function(vec){
 
 make_pops <- function(dF, cutoff, params, markers){
   dF <- dF[,params]
-  cnames <- colnames(dF)
-  if (cutoff == "median"){ cutoff <- apply(dF, 2, median) }
+  cnames <- colnames(dF) 
+  if (cutoff == "median"){ cutoff <- apply(dF, 2, function(x){ quantile(x, 0.5) })}
   else if (cutoff < 1){ cutoff <- apply(dF, 2, function(x, v) { quantile(x, v) }, v=cutoff) }
   else { cutoff <- rep(cutoff, length(params)) }
   d2 <- do.call(cbind, lapply(1:ncol(dF), function(i, a, b){
@@ -111,6 +111,8 @@ clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, nCellCu
 
   numbins <- ceiling(1/binSize)
   time <- exprs(fF$Time)
+  ## test for whether time exists - either at all or more than 1 value
+  if (mean(time) == time[1] | is.null(exprs(fF$Time))){ time <- 1:nrow(exprs(fF)) }
   # make sure time starts at 0
   if (min(time) > 0){ time <- time - min(time) }
   numOfEvents <- length(time)
