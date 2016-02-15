@@ -75,7 +75,10 @@ get_pops <- function(dF, cutoff, params, bins, nCellCutoff, markers, nstable){
   ## try to find as many pops as possible
   if (length(which(poplist$lengths >= nCellCutoff)) < nstable){
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> master
+=======
+>>>>>>> ed978db... pre-pub updates
 =======
 >>>>>>> ed978db... pre-pub updates
     cut_grid <- rev(seq(0.05, 0.5, by=0.05))
@@ -86,11 +89,14 @@ get_pops <- function(dF, cutoff, params, bins, nCellCutoff, markers, nstable){
     }
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     ## Currently dies if 'argument is of length 0'
     if(cut_grid == 0.05 & curr < 5){
       print("Sufficient populations cannot be identified by flowClean")
     }
 =======
+=======
+>>>>>>> ed978db... pre-pub updates
 =======
 >>>>>>> ed978db... pre-pub updates
     ## logic for seemingly redundant code:
@@ -104,7 +110,10 @@ get_pops <- function(dF, cutoff, params, bins, nCellCutoff, markers, nstable){
         warning(paste0("Less than ", nstable," populations identified by flowClean"))
     })
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> master
+=======
+>>>>>>> ed978db... pre-pub updates
 =======
 >>>>>>> ed978db... pre-pub updates
   }
@@ -130,6 +139,7 @@ get_pops <- function(dF, cutoff, params, bins, nCellCutoff, markers, nstable){
   return(list("full"=perdf, "trim"=perdf.trim))
 }
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, nCellCutoff=500,
                   announce=TRUE, cutoff="median", diagnostic=FALSE, fcMax=1.3, returnVector=FALSE){
@@ -139,6 +149,8 @@ clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, nCellCu
 =======
   return(list("full"=perdf, "trim"=perdf.trim, "pops"=popdf))
 }
+=======
+>>>>>>> ed978db... pre-pub updates
 =======
 >>>>>>> ed978db... pre-pub updates
  
@@ -476,10 +488,14 @@ getBad <- function(cpt, k=1.3){
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     if (length(binList) > length(ms)){
 =======
     if (length(binList) != length(ms)){
 >>>>>>> master
+=======
+    if (length(binList) != length(ms)){
+>>>>>>> ed978db... pre-pub updates
 =======
     if (length(binList) != length(ms)){
 >>>>>>> ed978db... pre-pub updates
@@ -508,7 +524,10 @@ bin.unlist <- function(bins){
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> ed978db... pre-pub updates
 posList <- function(bins){
     ids <- sapply(bins, function(xx){
         if (length(xx) == 1 && xx == -1){ return(FALSE) }
@@ -517,6 +536,9 @@ posList <- function(bins){
     return(bins[ids])
 }
 
+<<<<<<< HEAD
+>>>>>>> ed978db... pre-pub updates
+=======
 >>>>>>> ed978db... pre-pub updates
 cl.iter <- function(vectr, max.x){
    bins <- lapply(vectr, cl, vectr=vectr, max.x=max.x)
@@ -524,6 +546,7 @@ cl.iter <- function(vectr, max.x){
    bins <- posList(bin.unlist(bins))
    bins
 }
+<<<<<<< HEAD
 <<<<<<< HEAD
 
 =======
@@ -546,13 +569,20 @@ cl.iter <- function(vectr, max.x){
 =======
  
 >>>>>>> ed978db... pre-pub updates
+=======
+ 
+>>>>>>> ed978db... pre-pub updates
 cl <- function(x, vectr, max.x){
     id <- which(x == vectr)
     ## if the first CPT is not 1, and the 2nd CPT is CPT.1 + 1, return 2 entries.
     if (x == vectr[1] & vectr[1] != 1 & length(vectr) != 1){
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         if ((vectr[2] - x) == 1){ return(list(1:(x - 1),x)) }
+=======
+        if ((vectr[2] - x) == 1){ return(c(1:(x - 1),x)) }
+>>>>>>> ed978db... pre-pub updates
 =======
         if ((vectr[2] - x) == 1){ return(c(1:(x - 1),x)) }
 >>>>>>> ed978db... pre-pub updates
@@ -565,6 +595,7 @@ cl <- function(x, vectr, max.x){
         else { return(x) }
     }
     else{
+<<<<<<< HEAD
 <<<<<<< HEAD
         if (abs(x - vectr[id+1]) == 1){ return(x) }
 =======
@@ -580,6 +611,8 @@ cl <- function(x, vectr, max.x){
     else{
 =======
 >>>>>>> ed978db... pre-pub updates
+=======
+>>>>>>> ed978db... pre-pub updates
         if (((vectr[id+1] - x) == 1) & ((vectr[id+1] - vectr[id-1]) ==  2)){ return(x) }
         else if (((vectr[id+1] - x) == 1) & ((vectr[id+1] - vectr[id-1]) >  2)){
             return(-1) }
@@ -588,7 +621,10 @@ cl <- function(x, vectr, max.x){
                  ((x - vectr[id-2]) >  2)){
             return((x+1):(vectr[id+1])) }
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> master
+=======
+>>>>>>> ed978db... pre-pub updates
 =======
 >>>>>>> ed978db... pre-pub updates
         else { return(x:(vectr[id+1])) }
@@ -605,10 +641,14 @@ lp <- function(dF, p=NULL){
     lnorm <- sum(abs(pos)^p)^(1/p)
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     })
 =======
   })
 >>>>>>> master
+=======
+  })
+>>>>>>> ed978db... pre-pub updates
 =======
   })
 >>>>>>> ed978db... pre-pub updates
