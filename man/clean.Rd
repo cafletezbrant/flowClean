@@ -32,20 +32,25 @@ clean(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01,
   "median" (default) or in [0, 1], which is interpreted as a
   perecntile.  Integers > 1 will be interpreted as the fluorescence
   value to be used for a threshold.}
+  \item{announce}{ Print completion messages. }
   \item{fcMax}{ Maximum allowable increase relative to presumed 'good' data. }
   \item{announce}{ If TRUE, will print message to screen if errors
     detected.}
   \item{diagnostic}{ If TRUE, will make PNG of populations in time
-  bins, and save with same prefix as specified in filePrefixWithDir.}
+    bins, and save with same prefix as specified in filePrefixWithDir.}
+  \item{returnVector}{ If desired, only return vector indicating if a
+    given cell is 'good' or 'bad'.}
+  \item{nstable}{ The number of stable populations required to be
+  observed during the duration of an experiment.  Default is 5.}
 
 }
 
 \references{
-   Fletez-Brant C, Spidlen J, Brinkman R, Chattopadhyay P.  Quailty
-   Control of flow cytometry data through compositional data analysis.
-   In preparation.
+  Fletez-Brant C, Spidlen J, Brinkman R, Roederer M and Chattopadhyay P.
+  flowClean: Automated identification and removal of fluorescence
+  anomalies in flow cytometry data.  Cytometry Part A, 2016.
 }
-\author{Christopher Fletez-Brant, Pratip Chattopadhyay}
+\author{Kipper Fletez-Brant}
 
 \seealso{The package vignette.}
 \examples{
