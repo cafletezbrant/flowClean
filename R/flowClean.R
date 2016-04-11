@@ -63,42 +63,17 @@ name_maker <- function(aphbit, markers, full=TRUE){
   return(newv)
 }
 
-<<<<<<< HEAD
-get_pops <- function(dF, cutoff, params, bins, nCellCutoff, markers){
-  poplist <- make_pops(dF, cutoff, params, markers)
-  if (length(which(poplist$lengths >= nCellCutoff)) < 5){
-    curr <- length(which(poplist$lengths >= nCellCutoff))
-=======
 get_pops <- function(dF, cutoff, params, bins, nCellCutoff, markers, nstable){
   poplist <- make_pops(dF, cutoff, params, markers)
   curr <- length(which(poplist$lengths >= nCellCutoff))
   ## try to find as many pops as possible
   if (length(which(poplist$lengths >= nCellCutoff)) < nstable){
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> master
-=======
->>>>>>> ed978db... pre-pub updates
-=======
->>>>>>> ed978db... pre-pub updates
     cut_grid <- rev(seq(0.05, 0.5, by=0.05))
     while (curr < 5 & length(cut_grid) >= 1){
       poplist <- make_pops(dF, cut_grid[1], params, markers)
       curr <- length(which(poplist$lengths >= nCellCutoff))
       cut_grid <- cut_grid[-1]
     }
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-    ## Currently dies if 'argument is of length 0'
-    if(cut_grid == 0.05 & curr < 5){
-      print("Sufficient populations cannot be identified by flowClean")
-    }
-=======
-=======
->>>>>>> ed978db... pre-pub updates
-=======
->>>>>>> ed978db... pre-pub updates
     ## logic for seemingly redundant code:
     ## if the conditional evaluates and is true there are few pops
     ## if the conditional doesn't evaluate there are definitely few pops
@@ -109,13 +84,6 @@ get_pops <- function(dF, cutoff, params, bins, nCellCutoff, markers, nstable){
     }, error = function(e){
         warning(paste0("Less than ", nstable," populations identified by flowClean"))
     })
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> master
-=======
->>>>>>> ed978db... pre-pub updates
-=======
->>>>>>> ed978db... pre-pub updates
   }
   aphbit <- poplist$aphbit
   lengths <- poplist$lengths
@@ -135,24 +103,8 @@ get_pops <- function(dF, cutoff, params, bins, nCellCutoff, markers, nstable){
   rownames(perdf) <- pops
   good.idx <- which(lengths >= nCellCutoff)
   perdf.trim <- perdf[good.idx,1:length(bins)]
-<<<<<<< HEAD
-  return(list("full"=perdf, "trim"=perdf.trim))
-}
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, nCellCutoff=500,
-                  announce=TRUE, cutoff="median", diagnostic=FALSE, fcMax=1.3, returnVector=FALSE){
-
-  if (dim(exprs(fF))[1] < 30000){
-      warning("Too few cells in FCS for flowClean.")
-=======
   return(list("full"=perdf, "trim"=perdf.trim, "pops"=popdf))
 }
-=======
->>>>>>> ed978db... pre-pub updates
-=======
->>>>>>> ed978db... pre-pub updates
  
 clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, nCellCutoff=500,
                   announce=TRUE, cutoff="median", diagnostic=FALSE, fcMax=1.3,
@@ -164,22 +116,12 @@ clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, nCellCu
       outFCS <- makeFCS(fF, GoodVsBad, filePrefixWithDir, 0, nCellCutoff, ext,
                         stablePops=NULL)
       return(outFCS)
->>>>>>> master
   }
 
   markers <- parameters(fF)$name
   markers <- as.vector(markers)
 
   numbins <- ceiling(1/binSize)
-<<<<<<< HEAD
-  ## test for whether time exists - either at all or more than 1 value
-  time.id <- grep("time", colnames(exprs(fF)), ignore.case=TRUE)
-  if (length(time.id) > 0){
-      time <- exprs(fF)[,time.id]
-      if (mean(time) == time[1]){ time <- 1:nrow(exprs(fF)) }    
-  }
-  else { time <- 1:nrow(exprs(fF)) }
-=======
   time.id <- grep("time", colnames(exprs(fF)), ignore.case = TRUE)
   if (length(time.id) > 0) {
       time <- exprs(fF)[, time.id]
@@ -196,7 +138,6 @@ clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, nCellCu
       return(outFCS)      
   }
      
->>>>>>> master
   # make sure time starts at 0
   if (min(time) > 0){ time <- time - min(time) }
   numOfEvents <- length(time)
@@ -208,13 +149,6 @@ clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, nCellCu
     return(vec)
   }, x=time, y=stepB, z=numbins )
   binVector <- unlist(lapply(c(1:numbins), function(i, x){ rep(i, length(unlist(x[[i]]))) }, x=bins))
-<<<<<<< HEAD
-
-  out <- get_pops(exprs(fF), cutoff, params=vectMarkers, bins=bins, nCellCutoff, markers[vectMarkers])
-  full <- out$full
-  out <- out$trim
-  dxVector <- binVector
-=======
 ### out <- replace(out, is.na(out), 0)
   out <- get_pops(exprs(fF), cutoff, params=vectMarkers, bins=bins, nCellCutoff, markers[vectMarkers], nstable)
   full <- out$full
@@ -231,7 +165,6 @@ clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, nCellCu
   if (length(weird) > 0){
       out <- out[,-weird]
   }
->>>>>>> master
   out <- cen.log.ratio(out)
   norms <- lp(out)
   ## was previously penalty=AIC, but with recent updates this works better/does what AIC used to
@@ -239,18 +172,6 @@ clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, nCellCu
   bad <- getBad(pts, fcMax)
 
   ## what kind of bad do we report?
-<<<<<<< HEAD
-  if (!is.null(bad)){
-    if (bad[length(bad)] != numbins){
-        ## changepoint library frequently off by 1
-        bad <- unique(bad+1)
-    }
-    dxVector[which(dxVector %in% bad)] <- runif(length(which(dxVector %in% bad)), min=10000, max=20000)
-    GoodVsBad <- as.numeric(dxVector)
-    if (returnVector == TRUE){ return(GoodVsBad) }  
-    if (diagnostic){
-      png(paste(filePrefixWithDir,sep=".", numbins, nCellCutoff, "clr_percent_plot", "png"), type="cairo",
-=======
   if (!is.null(bad) | length(weird) > 0){
     if (length(weird) > 0){
         bad <- unique(c(unlist(fix.weird(bad, weird, numbins)), weird))
@@ -267,43 +188,28 @@ clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, nCellCu
     if (diagnostic){
       png(paste(filePrefixWithDir,sep=".", numbins, nCellCutoff,
                 "clr_percent_plot", "png"), type="cairo",
->>>>>>> master
           height=1000, width=1000)
       diagnosticPlot(out,"CLR", bad)
       dev.off()
     }
 
-<<<<<<< HEAD
-    outFCS <- makeFCS(fF, GoodVsBad, filePrefixWithDir, numbins, nCellCutoff, ext, stablePops=out) 
-    
-    if (announce){
-      print(paste("flowClean has identified problems in ", description(fF)$FILENAME, " with ", toString(bad),  ".", sep=""))
-=======
     outFCS <- makeFCS(fF, GoodVsBad, filePrefixWithDir, numbins, nCellCutoff,
                       ext, stablePops=out) 
     
     if (announce){
       print(paste("flowClean has identified problems in ",
                   description(fF)$FILENAME, " with ", toString(bad),  ".", sep=""))
->>>>>>> master
     }
     return(outFCS)
   }
   else{
     if (announce){
-<<<<<<< HEAD
-        print(paste("flowClean detected no problems in ", description(fF)$FILENAME, ".", sep=""))
-    }
-    if (diagnostic){
-      png(paste(filePrefixWithDir,sep=".", numbins, nCellCutoff, "clr_percent_plot", "png"), type="cairo",
-=======
         print(paste("flowClean detected no problems in ",
                     description(fF)$FILENAME, ".", sep=""))
     }
     if (diagnostic){
       png(paste(filePrefixWithDir,sep=".", numbins, nCellCutoff,
                 "clr_percent_plot", "png"), type="cairo",
->>>>>>> master
           height=1000, width=1000)
       diagnosticPlot(out,"CLR", bad)
       dev.off()
@@ -311,18 +217,12 @@ clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, nCellCu
 
     GoodVsBad <- as.numeric(dxVector)
     if (returnVector == TRUE){ return(GoodVsBad) }    
-<<<<<<< HEAD
-    outFCS <- makeFCS(fF, GoodVsBad, filePrefixWithDir, numbins, nCellCutoff, ext, stablePops=out)
-=======
     outFCS <- makeFCS(fF, GoodVsBad, filePrefixWithDir, numbins, nCellCutoff,
                       ext, stablePops=out)
->>>>>>> master
     return(outFCS)
   } 
 }
 
-<<<<<<< HEAD
-=======
 makeSeries <- function(vec){
     out <- list()
     out[[1]] <-  holder <- vec[1]
@@ -391,7 +291,6 @@ getUnlikely <- function(sums, seed){
 }
 
 
->>>>>>> master
 makeFCS <- function(fF, GoodVsBad, filePrefixWithDir, numbins, nCellCutoff, ext, stablePops){
   ex <- exprs(fF)
   rs <- attr(exprs(fF), "ranges")
@@ -486,19 +385,7 @@ getBad <- function(cpt, k=1.3){
 
     binList <- cl.iter(pts, len)
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-    if (length(binList) > length(ms)){
-=======
     if (length(binList) != length(ms)){
->>>>>>> master
-=======
-    if (length(binList) != length(ms)){
->>>>>>> ed978db... pre-pub updates
-=======
-    if (length(binList) != length(ms)){
->>>>>>> ed978db... pre-pub updates
         ms <- lapply(binList, function(xx){ return( mean(data.set(cpt)[unlist(xx)]) ) })
     }
 
@@ -522,34 +409,6 @@ bin.unlist <- function(bins){
    bins2
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> ed978db... pre-pub updates
-posList <- function(bins){
-    ids <- sapply(bins, function(xx){
-        if (length(xx) == 1 && xx == -1){ return(FALSE) }
-        else { return(TRUE) }
-    })
-    return(bins[ids])
-}
-
-<<<<<<< HEAD
->>>>>>> ed978db... pre-pub updates
-=======
->>>>>>> ed978db... pre-pub updates
-cl.iter <- function(vectr, max.x){
-   bins <- lapply(vectr, cl, vectr=vectr, max.x=max.x)
-#   browser()
-   bins <- posList(bin.unlist(bins))
-   bins
-}
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-=======
 posList <- function(bins){
     ids <- sapply(bins, function(xx){
         if (length(xx) == 1 && xx == -1){ return(FALSE) }
@@ -565,40 +424,10 @@ cl.iter <- function(vectr, max.x){
    bins
 }
  
->>>>>>> master
-=======
- 
->>>>>>> ed978db... pre-pub updates
-=======
- 
->>>>>>> ed978db... pre-pub updates
 cl <- function(x, vectr, max.x){
     id <- which(x == vectr)
     ## if the first CPT is not 1, and the 2nd CPT is CPT.1 + 1, return 2 entries.
     if (x == vectr[1] & vectr[1] != 1 & length(vectr) != 1){
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-        if ((vectr[2] - x) == 1){ return(list(1:(x - 1),x)) }
-=======
-        if ((vectr[2] - x) == 1){ return(c(1:(x - 1),x)) }
->>>>>>> ed978db... pre-pub updates
-=======
-        if ((vectr[2] - x) == 1){ return(c(1:(x - 1),x)) }
->>>>>>> ed978db... pre-pub updates
-        else { return(1:x) }
-    }
-    if (x == vectr[length(vectr)]){
-        if (x != max.x){ return((x+1):max.x) }
-        else if (x == max.x & length(vectr) > 1){ return((vectr[id-1] + 1):x) }
-        else if (x == max.x & length(vectr) == 1){ return(c(unlist(1:(x-1)), unlist(x))) }
-        else { return(x) }
-    }
-    else{
-<<<<<<< HEAD
-<<<<<<< HEAD
-        if (abs(x - vectr[id+1]) == 1){ return(x) }
-=======
         if ((vectr[2] - x) == 1){ return(c(1:(x - 1),x)) }
         else { return(1:x) }
     }
@@ -609,10 +438,6 @@ cl <- function(x, vectr, max.x){
         else { return(x) }
     }
     else{
-=======
->>>>>>> ed978db... pre-pub updates
-=======
->>>>>>> ed978db... pre-pub updates
         if (((vectr[id+1] - x) == 1) & ((vectr[id+1] - vectr[id-1]) ==  2)){ return(x) }
         else if (((vectr[id+1] - x) == 1) & ((vectr[id+1] - vectr[id-1]) >  2)){
             return(-1) }
@@ -620,13 +445,6 @@ cl <- function(x, vectr, max.x){
                  ((id - 2) > 0) && ((x - vectr[id-1]) > 1)  &&
                  ((x - vectr[id-2]) >  2)){
             return((x+1):(vectr[id+1])) }
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> master
-=======
->>>>>>> ed978db... pre-pub updates
-=======
->>>>>>> ed978db... pre-pub updates
         else { return(x:(vectr[id+1])) }
     }
 }
@@ -639,19 +457,7 @@ lp <- function(dF, p=NULL){
       p = length(pos)
     }
     lnorm <- sum(abs(pos)^p)^(1/p)
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-    })
-=======
   })
->>>>>>> master
-=======
-  })
->>>>>>> ed978db... pre-pub updates
-=======
-  })
->>>>>>> ed978db... pre-pub updates
   return(xnorms)
 }
 
