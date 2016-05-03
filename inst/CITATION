@@ -1,0 +1,10 @@
+citEntry(entry="article",
+         author=c(person("Kipper", "Fletez-Brant"),
+                  person("Josef", "Spidlen"),
+                  person(c("Ryan", "R"), "Brinkman"),
+                  person("Mario", "Roederer"),
+                  person(c("Pratip", "K"), "Chattopadhyay")),
+         title="{flowClean}: Automated identification and removal of fluorescence anomalies in flow cytometry data",
+         journal="Cytometry Part A",
+         year=2016,
+         textVersion="Fletez-Brant, K., Spidlen, S., Brinkman, R.R., Roederer, M., and Chattopadhyay, P.K. (2016).  flowClean: Automated identification and removal of fluorescence anomalies in flow cytometry data. Cytometry Part A.")
