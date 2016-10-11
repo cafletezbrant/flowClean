@@ -110,7 +110,7 @@ as any other flow parameter as well.
 
 \begin{small}
 <<label=fig1plot, include=FALSE, fig=FALSE>>=
-lgcl <- estimateLogicle(synPerturbed.c, parameters(synPerturbed.c)$name[5:16])
+lgcl <- estimateLogicle(synPerturbed.c, unname(parameters(synPerturbed.c)$name[5:16]))
 synPerturbed.cl <- transform(synPerturbed.c, lgcl)
 p1 <- xyplot(`<V705-A>` ~ `Time`, data=synPerturbed.cl, 
              abs=TRUE, smooth=FALSE, alpha=0.5, xlim=c(0, 100))
