@@ -425,28 +425,31 @@ cl.iter <- function(vectr, max.x){
 }
  
 cl <- function(x, vectr, max.x){
-    id <- which(x == vectr)
-    ## if the first CPT is not 1, and the 2nd CPT is CPT.1 + 1, return 2 entries.
-    if (x == vectr[1] & vectr[1] != 1 & length(vectr) != 1){
-        if ((vectr[2] - x) == 1){ return(c(1:(x - 1),x)) }
-        else { return(1:x) }
-    }
-    if (x == vectr[length(vectr)]){
-        if (x != max.x){ return((x+1):max.x) }
-        else if (x == max.x & length(vectr) > 1){ return((vectr[id-1] + 1):x) }
-        else if (x == max.x & length(vectr) == 1){ return(c(unlist(1:(x-1)), unlist(x))) }
-        else { return(x) }
-    }
-    else{
-        if (((vectr[id+1] - x) == 1) & ((vectr[id+1] - vectr[id-1]) ==  2)){ return(x) }
-        else if (((vectr[id+1] - x) == 1) & ((vectr[id+1] - vectr[id-1]) >  2)){
-            return(-1) }
-        else if (((vectr[id+1] - x) > 1) && ((vectr[id+1] - vectr[id-1]) >  2) &&
-                 ((id - 2) > 0) && ((x - vectr[id-1]) > 1)  &&
-                 ((x - vectr[id-2]) >  2)){
-            return((x+1):(vectr[id+1])) }
-        else { return(x:(vectr[id+1])) }
-    }
+  id <- which(x == vectr)
+  if (x == 1){
+    return(x)
+  }
+  ## if the first CPT is not 1, and the 2nd CPT is CPT.1 + 1, return 2 entries.
+  if (x == vectr[1] & vectr[1] != 1 & length(vectr) != 1){
+    if ((vectr[2] - x) == 1){ return(c(1:(x - 1),x)) }
+    else { return(1:x) }
+  }
+  if (x == vectr[length(vectr)]){
+    if (x != max.x){ return((x+1):max.x) }
+    else if (x == max.x & length(vectr) > 1){ return((vectr[id-1] + 1):x) }
+    else if (x == max.x & length(vectr) == 1){ return(c(unlist(1:(x-1)), unlist(x))) }
+    else { return(x) }
+  }
+  else{
+    if (((vectr[id+1] - x) == 1) & ((vectr[id+1] - vectr[id-1]) ==  2)){ return(x) }
+    else if (((vectr[id+1] - x) == 1) & ((vectr[id+1] - vectr[id-1]) >  2)){
+      return(-1) }
+    else if (((vectr[id+1] - x) > 1) && ((vectr[id+1] - vectr[id-1]) >  2) &&
+             ((id - 2) > 0) && ((x - vectr[id-1]) > 1)  &&
+             ((x - vectr[id-2]) >  2)){
+        return((x+1):(vectr[id+1])) }
+    else { return(x:(vectr[id+1])) }
+  }
 }
 
 
