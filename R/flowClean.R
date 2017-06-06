@@ -13,7 +13,9 @@ make_pops <- function(dF, cutoff, params, markers){
   dF <- dF[,params]
   cnames <- colnames(dF) 
   if (cutoff == "median"){ cutoff <- apply(dF, 2, function(x){ quantile(x, 0.5) })}
-  else if (cutoff < 1){ cutoff <- apply(dF, 2, function(x, v) { quantile(x, v) }, v=cutoff) }
+  else if (cutoff < 1){
+    cutoff <- apply(dF, 2, function(x, v) { quantile(x, v) }, v=cutoff)
+  }
   else { cutoff <- rep(cutoff, length(params)) }
   d2 <- do.call(cbind, lapply(1:ncol(dF), function(i, a, b){
     x <- a[,i]
@@ -148,9 +150,11 @@ clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, nCellCu
     if (i == z){ vec <- c(vec, which(x >= (i * y))) }
     return(vec)
   }, x=time, y=stepB, z=numbins )
-  binVector <- unlist(lapply(c(1:numbins), function(i, x){ rep(i, length(unlist(x[[i]]))) }, x=bins))
-### out <- replace(out, is.na(out), 0)
-  out <- get_pops(exprs(fF), cutoff, params=vectMarkers, bins=bins, nCellCutoff, markers[vectMarkers], nstable)
+  binVector <- unlist(lapply(c(1:numbins), function(i, x){
+    rep(i, length(unlist(x[[i]]))) }, x=bins))
+  ### NOTE: implicitly assuming vectMarkers is numeric
+  out <- get_pops(exprs(fF), cutoff, params=vectMarkers, bins=bins,
+                  nCellCutoff, markers[vectMarkers], nstable)
   full <- out$full
   pops <- out$pops
   out <- out$trim
@@ -167,7 +171,8 @@ clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, nCellCu
   }
   out <- cen.log.ratio(out)
   norms <- lp(out)
-  ## was previously penalty=AIC, but with recent updates this works better/does what AIC used to
+  ## was previously penalty=AIC, but with recent updates this works
+  ## better/does what AIC used to
   pts <- cpt.mean(norms, method="PELT", penalty="Manual", pen.value=1)
   bad <- getBad(pts, fcMax)
 
@@ -352,7 +357,10 @@ cen.log.ratio <- function(dF, minim=1e-7){
   Ts <- (d*m*(m+1))/(n^2)
 
   #modified Aitchison of Fry et al
-  rev_df <- apply(dF, c(1,2), function(x){ if (x == 0){ x <- ta } else { x <- x - (x*Ts) }; return(x) })
+  rev_df <- apply(dF, c(1,2), function(x){
+    if (x == 0){ x <- ta }
+    else { x <- x - (x*Ts) }; return(x)
+  })
   rev_df <- apply(rev_df, 2, function(x) {return(log(x/geo.mean(x)))})
 
   return(rev_df)
