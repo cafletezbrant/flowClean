@@ -107,7 +107,7 @@ get_pops <- function(dF, cutoff, params, bins, nCellCutoff, markers, nstable){
   perdf.trim <- perdf[good.idx,1:length(bins)]
   return(list("full"=perdf, "trim"=perdf.trim, "pops"=popdf))
 }
- 
+
 clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, nCellCutoff=500,
                   announce=TRUE, cutoff="median", diagnostic=FALSE, fcMax=1.3,
                   returnVector=FALSE, nstable=5){
@@ -137,9 +137,8 @@ clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, nCellCu
       GoodVsBad <- rep.int(0, times=nrow(exprs(fF)))
       outFCS <- makeFCS(fF, GoodVsBad, filePrefixWithDir, 0, nCellCutoff, ext,
                         stablePops=NULL)
-      return(outFCS)      
+      return(outFCS)
   }
-     
   # make sure time starts at 0
   if (min(time) > 0){ time <- time - min(time) }
   numOfEvents <- length(time)
@@ -190,7 +189,7 @@ clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, nCellCu
     dxVector[which(dxVector %in% bad)] <- runif(length(which(dxVector %in% bad)),
                                                 min=10000, max=20000)
     GoodVsBad <- as.numeric(dxVector)
-    if (returnVector == TRUE){ return(GoodVsBad) }  
+    if (returnVector == TRUE){ return(GoodVsBad) }
     if (diagnostic){
       png(paste(filePrefixWithDir,sep=".", numbins, nCellCutoff,
                 "clr_percent_plot", "png"), type="cairo",
@@ -200,8 +199,7 @@ clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, nCellCu
     }
 
     outFCS <- makeFCS(fF, GoodVsBad, filePrefixWithDir, numbins, nCellCutoff,
-                      ext, stablePops=out) 
-    
+                      ext, stablePops=out)
     if (announce){
       print(paste("flowClean has identified problems in ",
                   description(fF)$FILENAME, " with ", toString(bad),  ".", sep=""))
@@ -222,7 +220,7 @@ clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, nCellCu
    }
 
     GoodVsBad <- as.numeric(dxVector)
-    if (returnVector == TRUE){ return(GoodVsBad) }    
+    if (returnVector == TRUE){ return(GoodVsBad) }
     outFCS <- makeFCS(fF, GoodVsBad, filePrefixWithDir, numbins, nCellCutoff,
                       ext, stablePops=out)
     return(outFCS)
