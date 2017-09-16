@@ -173,6 +173,7 @@ clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, nCellCu
   norms <- lp(out)
   ## was previously penalty=AIC, but with recent updates this works
   ## better/does what AIC used to
+  ## what is the indexing here?  
   pts <- cpt.mean(norms, method="PELT", penalty="Manual", pen.value=1)
   bad <- getBad(pts, fcMax)
 
@@ -265,11 +266,14 @@ fix.weird <- function(bad, weird, maxBin){
     shifts <- sapply(sapply(ser.w, max), function(xx){
         which(sapply(ser.b, min) > xx)[1]
     })
-    devnull <- sapply(1:length(shifts[!is.na(shifts)]), function(ii){
-        bad.id <- shifts[ii]        
+    ## occasionally the weird bin is the last bin
+    if (!is.na(shifts)){
+      devnull <- sapply(1:length(shifts[!is.na(shifts)]), function(ii){
+        bad.id <- shifts[ii]
         bad.offset <- length(ser.w[[ii]])
         ser.b[[bad.id]] <<- ser.b[[bad.id]] + bad.offset
-    })
+      })
+    }
     ## problem is not here!
     ser.b
 }
