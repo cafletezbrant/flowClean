@@ -13,9 +13,13 @@ make_pops <- function(dF, cutoff, params, markers){
   dF <- dF[,params]
   cnames <- colnames(dF) 
   if (cutoff == "median"){ cutoff <- apply(dF, 2, function(x){ quantile(x, 0.5) })}
+<<<<<<< HEAD
   else if (cutoff < 1){
     cutoff <- apply(dF, 2, function(x, v) { quantile(x, v) }, v=cutoff)
   }
+=======
+  else if (cutoff < 1){ cutoff <- apply(dF, 2, function(x, v) { quantile(x, v) }, v=cutoff) }
+>>>>>>> upstream/master
   else { cutoff <- rep(cutoff, length(params)) }
   d2 <- do.call(cbind, lapply(1:ncol(dF), function(i, a, b){
     x <- a[,i]
