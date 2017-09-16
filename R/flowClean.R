@@ -13,7 +13,13 @@ make_pops <- function(dF, cutoff, params, markers){
   dF <- dF[,params]
   cnames <- colnames(dF) 
   if (cutoff == "median"){ cutoff <- apply(dF, 2, function(x){ quantile(x, 0.5) })}
+<<<<<<< HEAD
+  else if (cutoff < 1){
+    cutoff <- apply(dF, 2, function(x, v) { quantile(x, v) }, v=cutoff)
+  }
+=======
   else if (cutoff < 1){ cutoff <- apply(dF, 2, function(x, v) { quantile(x, v) }, v=cutoff) }
+>>>>>>> upstream/master
   else { cutoff <- rep(cutoff, length(params)) }
   d2 <- do.call(cbind, lapply(1:ncol(dF), function(i, a, b){
     x <- a[,i]
@@ -105,7 +111,7 @@ get_pops <- function(dF, cutoff, params, bins, nCellCutoff, markers, nstable){
   perdf.trim <- perdf[good.idx,1:length(bins)]
   return(list("full"=perdf, "trim"=perdf.trim, "pops"=popdf))
 }
- 
+
 clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, nCellCutoff=500,
                   announce=TRUE, cutoff="median", diagnostic=FALSE, fcMax=1.3,
                   returnVector=FALSE, nstable=5){
@@ -135,9 +141,8 @@ clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, nCellCu
       GoodVsBad <- rep.int(0, times=nrow(exprs(fF)))
       outFCS <- makeFCS(fF, GoodVsBad, filePrefixWithDir, 0, nCellCutoff, ext,
                         stablePops=NULL)
-      return(outFCS)      
+      return(outFCS)
   }
-     
   # make sure time starts at 0
   if (min(time) > 0){ time <- time - min(time) }
   numOfEvents <- length(time)
@@ -148,9 +153,11 @@ clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, nCellCu
     if (i == z){ vec <- c(vec, which(x >= (i * y))) }
     return(vec)
   }, x=time, y=stepB, z=numbins )
-  binVector <- unlist(lapply(c(1:numbins), function(i, x){ rep(i, length(unlist(x[[i]]))) }, x=bins))
-### out <- replace(out, is.na(out), 0)
-  out <- get_pops(exprs(fF), cutoff, params=vectMarkers, bins=bins, nCellCutoff, markers[vectMarkers], nstable)
+  binVector <- unlist(lapply(c(1:numbins), function(i, x){
+    rep(i, length(unlist(x[[i]]))) }, x=bins))
+  ### NOTE: implicitly assuming vectMarkers is numeric
+  out <- get_pops(exprs(fF), cutoff, params=vectMarkers, bins=bins,
+                  nCellCutoff, markers[vectMarkers], nstable)
   full <- out$full
   pops <- out$pops
   out <- out$trim
@@ -167,7 +174,9 @@ clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, nCellCu
   }
   out <- cen.log.ratio(out)
   norms <- lp(out)
-  ## was previously penalty=AIC, but with recent updates this works better/does what AIC used to
+  ## was previously penalty=AIC, but with recent updates this works
+  ## better/does what AIC used to
+  ## what is the indexing here?  
   pts <- cpt.mean(norms, method="PELT", penalty="Manual", pen.value=1)
   bad <- getBad(pts, fcMax)
 
@@ -184,7 +193,7 @@ clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, nCellCu
     dxVector[which(dxVector %in% bad)] <- runif(length(which(dxVector %in% bad)),
                                                 min=10000, max=20000)
     GoodVsBad <- as.numeric(dxVector)
-    if (returnVector == TRUE){ return(GoodVsBad) }  
+    if (returnVector == TRUE){ return(GoodVsBad) }
     if (diagnostic){
       png(paste(filePrefixWithDir,sep=".", numbins, nCellCutoff,
                 "clr_percent_plot", "png"), type="cairo",
@@ -194,8 +203,7 @@ clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, nCellCu
     }
 
     outFCS <- makeFCS(fF, GoodVsBad, filePrefixWithDir, numbins, nCellCutoff,
-                      ext, stablePops=out) 
-    
+                      ext, stablePops=out)
     if (announce){
       print(paste("flowClean has identified problems in ",
                   description(fF)$FILENAME, " with ", toString(bad),  ".", sep=""))
@@ -216,7 +224,7 @@ clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, nCellCu
    }
 
     GoodVsBad <- as.numeric(dxVector)
-    if (returnVector == TRUE){ return(GoodVsBad) }    
+    if (returnVector == TRUE){ return(GoodVsBad) }
     outFCS <- makeFCS(fF, GoodVsBad, filePrefixWithDir, numbins, nCellCutoff,
                       ext, stablePops=out)
     return(outFCS)
@@ -260,11 +268,14 @@ fix.weird <- function(bad, weird, maxBin){
     shifts <- sapply(sapply(ser.w, max), function(xx){
         which(sapply(ser.b, min) > xx)[1]
     })
-    devnull <- sapply(1:length(shifts[!is.na(shifts)]), function(ii){
-        bad.id <- shifts[ii]        
+    ## occasionally the weird bin is the last bin
+    if (!is.na(shifts)){
+      devnull <- sapply(1:length(shifts[!is.na(shifts)]), function(ii){
+        bad.id <- shifts[ii]
         bad.offset <- length(ser.w[[ii]])
         ser.b[[bad.id]] <<- ser.b[[bad.id]] + bad.offset
-    })
+      })
+    }
     ## problem is not here!
     ser.b
 }
@@ -352,7 +363,10 @@ cen.log.ratio <- function(dF, minim=1e-7){
   Ts <- (d*m*(m+1))/(n^2)
 
   #modified Aitchison of Fry et al
-  rev_df <- apply(dF, c(1,2), function(x){ if (x == 0){ x <- ta } else { x <- x - (x*Ts) }; return(x) })
+  rev_df <- apply(dF, c(1,2), function(x){
+    if (x == 0){ x <- ta }
+    else { x <- x - (x*Ts) }; return(x)
+  })
   rev_df <- apply(rev_df, 2, function(x) {return(log(x/geo.mean(x)))})
 
   return(rev_df)
@@ -425,28 +439,31 @@ cl.iter <- function(vectr, max.x){
 }
  
 cl <- function(x, vectr, max.x){
-    id <- which(x == vectr)
-    ## if the first CPT is not 1, and the 2nd CPT is CPT.1 + 1, return 2 entries.
-    if (x == vectr[1] & vectr[1] != 1 & length(vectr) != 1){
-        if ((vectr[2] - x) == 1){ return(c(1:(x - 1),x)) }
-        else { return(1:x) }
-    }
-    if (x == vectr[length(vectr)]){
-        if (x != max.x){ return((x+1):max.x) }
-        else if (x == max.x & length(vectr) > 1){ return((vectr[id-1] + 1):x) }
-        else if (x == max.x & length(vectr) == 1){ return(c(unlist(1:(x-1)), unlist(x))) }
-        else { return(x) }
-    }
-    else{
-        if (((vectr[id+1] - x) == 1) & ((vectr[id+1] - vectr[id-1]) ==  2)){ return(x) }
-        else if (((vectr[id+1] - x) == 1) & ((vectr[id+1] - vectr[id-1]) >  2)){
-            return(-1) }
-        else if (((vectr[id+1] - x) > 1) && ((vectr[id+1] - vectr[id-1]) >  2) &&
-                 ((id - 2) > 0) && ((x - vectr[id-1]) > 1)  &&
-                 ((x - vectr[id-2]) >  2)){
-            return((x+1):(vectr[id+1])) }
-        else { return(x:(vectr[id+1])) }
-    }
+  id <- which(x == vectr)
+  if (x == 1){
+    return(x)
+  }
+  ## if the first CPT is not 1, and the 2nd CPT is CPT.1 + 1, return 2 entries.
+  if (x == vectr[1] & vectr[1] != 1 & length(vectr) != 1){
+    if ((vectr[2] - x) == 1){ return(c(1:(x - 1),x)) }
+    else { return(1:x) }
+  }
+  if (x == vectr[length(vectr)]){
+    if (x != max.x){ return((x+1):max.x) }
+    else if (x == max.x & length(vectr) > 1){ return((vectr[id-1] + 1):x) }
+    else if (x == max.x & length(vectr) == 1){ return(c(unlist(1:(x-1)), unlist(x))) }
+    else { return(x) }
+  }
+  else{
+    if (((vectr[id+1] - x) == 1) & ((vectr[id+1] - vectr[id-1]) ==  2)){ return(x) }
+    else if (((vectr[id+1] - x) == 1) & ((vectr[id+1] - vectr[id-1]) >  2)){
+      return(-1) }
+    else if (((vectr[id+1] - x) > 1) && ((vectr[id+1] - vectr[id-1]) >  2) &&
+             ((id - 2) > 0) && ((x - vectr[id-1]) > 1)  &&
+             ((x - vectr[id-2]) >  2)){
+        return((x+1):(vectr[id+1])) }
+    else { return(x:(vectr[id+1])) }
+  }
 }
 
 
