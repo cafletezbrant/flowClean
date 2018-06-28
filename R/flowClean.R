@@ -112,9 +112,14 @@ clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, nCellCu
                   announce=TRUE, cutoff="median", diagnostic=FALSE, fcMax=1.3,
                   returnVector=FALSE, nstable=5){
 
-  if (dim(exprs(fF))[1] < 30000){
+  if (nrow(fF) < 30000){
+      if (announce){
+          print(paste("flowClean detected too few cells in ",
+                      description(fF)$FILENAME, ".", sep=""))
+      }
       warning("Too few cells in FCS for flowClean.")
-      GoodVsBad <- rep.int(0, times=nrow(exprs(fF)))
+      GoodVsBad <- rep.int(0, times=nrow(fF))
+      if (returnVector == TRUE){ return(GoodVsBad) }
       outFCS <- makeFCS(fF, GoodVsBad, filePrefixWithDir, 0, nCellCutoff, ext,
                         stablePops=NULL)
       return(outFCS)
@@ -124,17 +129,22 @@ clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, nCellCu
   markers <- as.vector(markers)
 
   numbins <- ceiling(1/binSize)
-  time.id <- grep("time", colnames(exprs(fF)), ignore.case = TRUE)
+  time.id <- grep("time", colnames(fF), ignore.case = TRUE)
   if (length(time.id) > 0) {
       time <- exprs(fF)[, time.id]
       ## Have to deal with this here
       ## if (mean(time) == time[1]) {
-      ##     time <- 1:nrow(exprs(fF))
+      ##     time <- 1:nrow(fF)
       ## }
   }
   else {
+      if (announce){
+          print(paste("flowClean detected no Time parameter in ",
+                      description(fF)$FILENAME, ".", sep=""))
+      }
       warning("No Time Parameter Detected")
-      GoodVsBad <- rep.int(0, times=nrow(exprs(fF)))
+      GoodVsBad <- rep.int(0, times=nrow(fF))
+      if (returnVector == TRUE){ return(GoodVsBad) }
       outFCS <- makeFCS(fF, GoodVsBad, filePrefixWithDir, 0, nCellCutoff, ext,
                         stablePops=NULL)
       return(outFCS)
