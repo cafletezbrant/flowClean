@@ -9,5 +9,5 @@ Imports: bit, changepoint, sfsmisc
 Suggests: flowViz, grid, gridExtra
 License: Artistic-2.0
 LazyLoad: yes
-biocViews: FlowCytometry, QualityControl
+biocViews: FlowCytometry, QualityControl, ImmunoOncology
 NeedsCompilation: no
