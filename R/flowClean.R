@@ -112,7 +112,7 @@ clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, nCellCu
                   announce=TRUE, cutoff="median", diagnostic=FALSE, fcMax=1.3,
                   returnVector=FALSE, nstable=5){
 
-  if (dim(exprs(fF))[1] < 30000){
+  if (dim(exprs(fF))[1] < 10000){
       warning("Too few cells in FCS for flowClean.")
       GoodVsBad <- rep.int(0, times=nrow(exprs(fF)))
       outFCS <- makeFCS(fF, GoodVsBad, filePrefixWithDir, 0, nCellCutoff, ext,
@@ -304,7 +304,7 @@ makeFCS <- function(fF, GoodVsBad, filePrefixWithDir, numbins, nCellCutoff, ext,
   rs <- c(rs, rs[1])
   ex <- cbind(ex, GoodVsBad)
   attr(ex, "ranges") <- rs
-  NN <- as.numeric(description(fF)["$PAR"]) + 1
+  NN <- as.numeric(keyword(fF)["$PAR"]) + 1
   names(dimnames(ex)[[2]]) <- sprintf("$P%sN", 1:NN)
   pnr <- paste0("$P", NN, "R")
   pnb <- paste0("$P", NN, "B")
@@ -315,20 +315,20 @@ makeFCS <- function(fF, GoodVsBad, filePrefixWithDir, numbins, nCellCutoff, ext,
   flowCorePnRmin <- paste0("flowCore_$P", NN, "Rmin")
 
   o <- parameters(fF)@data
-  o[length(o[,1]) + 1,] <- c("GoodVsBad", "GoodVsBad", as.numeric(description(fF)$`$P1R`), 0, as.numeric(description(fF)$`$P1R`) - 1)
-  outFCS <- new("flowFrame", exprs=ex, parameters=new("AnnotatedDataFrame",o), description=description(fF))
-  description(outFCS)$FILENAME <- paste(filePrefixWithDir,sep=".", numbins, nCellCutoff, "revised", ext)
-  description(outFCS)[pnr] <- max(20000, description(outFCS)$`$P1R`)
-  description(outFCS)[pnb] <- description(outFCS)$`$P1B`
-  description(outFCS)[pne] <- "0,0"
-  description(outFCS)[pnn] <- "GoodVsBad"
-  description(outFCS)[pns] <- "GoodVsBad"
-  description(outFCS)$`$PAR` <- NN
-  description(outFCS)$`StablePops` <- nrow(stablePops)
-  description(outFCS)$`nBins` <- numbins
-  description(outFCS)$`nCellCutoff` <- nCellCutoff
-  description(outFCS)[flowCorePnRmax] <- max(20000, description(outFCS)$`flowCore_$P1Rmax`)
-  description(outFCS)[flowCorePnRmin] <- 0
+  o[length(o[,1]) + 1,] <- c("GoodVsBad", "GoodVsBad", as.numeric(keyword(fF)$`$P1R`), 0, as.numeric(keyword(fF)$`$P1R`) - 1)
+  outFCS <- new("flowFrame", exprs=ex, parameters=new("AnnotatedDataFrame",o), keyword=keyword(fF))
+  keyword(outFCS)$FILENAME <- paste(filePrefixWithDir,sep=".", numbins, nCellCutoff, "revised", ext)
+  keyword(outFCS)[pnr] <- max(20000, keyword(outFCS)$`$P1R`)
+  keyword(outFCS)[pnb] <- keyword(outFCS)$`$P1B`
+  keyword(outFCS)[pne] <- "0,0"
+  keyword(outFCS)[pnn] <- "GoodVsBad"
+  keyword(outFCS)[pns] <- "GoodVsBad"
+  keyword(outFCS)$`$PAR` <- NN
+  keyword(outFCS)$`StablePops` <- nrow(stablePops)
+  keyword(outFCS)$`nBins` <- numbins
+  keyword(outFCS)$`nCellCutoff` <- nCellCutoff
+  keyword(outFCS)[flowCorePnRmax] <- max(20000, keyword(outFCS)$`flowCore_$P1Rmax`)
+  keyword(outFCS)[flowCorePnRmin] <- 0
   parameters(outFCS)@data$range <- as.numeric(parameters(outFCS)@data$range)
   parameters(outFCS)@data$minRange <- as.numeric(parameters(outFCS)@data$minRange)
   parameters(outFCS)@data$maxRange <- as.numeric(parameters(outFCS)@data$maxRange)
