@@ -317,18 +317,18 @@ makeFCS <- function(fF, GoodVsBad, filePrefixWithDir, numbins, nCellCutoff, ext,
   o <- parameters(fF)@data
   o[length(o[,1]) + 1,] <- c("GoodVsBad", "GoodVsBad", as.numeric(keyword(fF)$`$P1R`), 0, as.numeric(keyword(fF)$`$P1R`) - 1)
   outFCS <- new("flowFrame", exprs=ex, parameters=new("AnnotatedDataFrame",o), description=keyword(fF))
-  description(outFCS)$FILENAME <- paste(filePrefixWithDir,sep=".", numbins, nCellCutoff, "revised", ext)
-  description(outFCS)[pnr] <- max(20000, description(outFCS)$`$P1R`)
-  description(outFCS)[pnb] <- description(outFCS)$`$P1B`
-  description(outFCS)[pne] <- "0,0"
-  description(outFCS)[pnn] <- "GoodVsBad"
-  description(outFCS)[pns] <- "GoodVsBad"
-  description(outFCS)$`$PAR` <- NN
-  description(outFCS)$`StablePops` <- nrow(stablePops)
-  description(outFCS)$`nBins` <- numbins
-  description(outFCS)$`nCellCutoff` <- nCellCutoff
-  description(outFCS)[flowCorePnRmax] <- max(20000, description(outFCS)$`flowCore_$P1Rmax`)
-  description(outFCS)[flowCorePnRmin] <- 0
+  keyword(outFCS)$FILENAME <- paste(filePrefixWithDir,sep=".", numbins, nCellCutoff, "revised", ext)
+  keyword(outFCS)[pnr] <- max(20000, keyword(outFCS)$`$P1R`)
+  keyword(outFCS)[pnb] <- keyword(outFCS)$`$P1B`
+  keyword(outFCS)[pne] <- "0,0"
+  keyword(outFCS)[pnn] <- "GoodVsBad"
+  keyword(outFCS)[pns] <- "GoodVsBad"
+  keyword(outFCS)$`$PAR` <- NN
+  keyword(outFCS)$`StablePops` <- nrow(stablePops)
+  keyword(outFCS)$`nBins` <- numbins
+  keyword(outFCS)$`nCellCutoff` <- nCellCutoff
+  keyword(outFCS)[flowCorePnRmax] <- max(20000, keyword(outFCS)$`flowCore_$P1Rmax`)
+  keyword(outFCS)[flowCorePnRmin] <- 0
   parameters(outFCS)@data$range <- as.numeric(parameters(outFCS)@data$range)
   parameters(outFCS)@data$minRange <- as.numeric(parameters(outFCS)@data$minRange)
   parameters(outFCS)@data$maxRange <- as.numeric(parameters(outFCS)@data$maxRange)
