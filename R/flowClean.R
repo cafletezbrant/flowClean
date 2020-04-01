@@ -3,7 +3,7 @@ require(sfsmisc)
 require(changepoint)
 require(bit)
 require(grid)
-#Sys.setlocale('LC_ALL','C') ## Occasional multibyte string issue
+Sys.setlocale('LC_ALL','C') ## Occasional multibyte string issue
 
 geo.mean <- function(vec){
   return(exp(mean(log(vec))))
