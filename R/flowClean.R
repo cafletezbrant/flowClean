@@ -112,7 +112,7 @@ clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, nCellCu
                   announce=TRUE, cutoff="median", diagnostic=FALSE, fcMax=1.3,
                   returnVector=FALSE, nstable=5){
 
-  if (dim(exprs(fF))[1] < 10000){
+  if (dim(exprs(fF))[1] < 30000){
       warning("Too few cells in FCS for flowClean.")
       GoodVsBad <- rep.int(0, times=nrow(exprs(fF)))
       outFCS <- makeFCS(fF, GoodVsBad, filePrefixWithDir, 0, nCellCutoff, ext,
