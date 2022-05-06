@@ -265,7 +265,7 @@ fix.weird <- function(bad, weird, maxBin){
         which(sapply(ser.b, min) > xx)[1]
     })
     ## occasionally the weird bin is the last bin
-    if (!is.na(shifts)){
+    if (any(!is.na(shifts))) {
       devnull <- sapply(1:length(shifts[!is.na(shifts)]), function(ii){
         bad.id <- shifts[ii]
         bad.offset <- length(ser.w[[ii]])
