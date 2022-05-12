@@ -198,8 +198,11 @@ clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, nCellCu
     bad <- sort(bad)
     dxVector[which(dxVector %in% bad)] <- runif(length(which(dxVector %in% bad)),
                                                 min=10000, max=20000)
-    GoodVsBad <- as.numeric(dxVector)
-    if (returnVector == TRUE){ return(GoodVsBad) }
+    
+    if (announce){
+      print(paste("flowClean has identified problems in ",
+                  description(fF)$FILENAME, " with ", toString(bad),  ".", sep=""))
+    }
     if (diagnostic){
       png(paste(filePrefixWithDir,sep=".", numbins, nCellCutoff,
                 "clr_percent_plot", "png"), type="cairo",
@@ -207,13 +210,13 @@ clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, nCellCu
       diagnosticPlot(out,"CLR", bad)
       dev.off()
     }
+    GoodVsBad <- as.numeric(dxVector)
+    if (returnVector){ return(GoodVsBad) }
+    
 
     outFCS <- makeFCS(fF, GoodVsBad, filePrefixWithDir, numbins, nCellCutoff,
                       ext, stablePops=out)
-    if (announce){
-      print(paste("flowClean has identified problems in ",
-                  description(fF)$FILENAME, " with ", toString(bad),  ".", sep=""))
-    }
+
     return(outFCS)
   }
   else{
@@ -230,7 +233,7 @@ clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, nCellCu
    }
 
     GoodVsBad <- as.numeric(dxVector)
-    if (returnVector == TRUE){ return(GoodVsBad) }
+    if (returnVector){ return(GoodVsBad) }
     outFCS <- makeFCS(fF, GoodVsBad, filePrefixWithDir, numbins, nCellCutoff,
                       ext, stablePops=out)
     return(outFCS)
