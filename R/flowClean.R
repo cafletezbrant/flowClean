@@ -115,7 +115,7 @@ clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, nCellCu
   if (nrow(fF) < 30000){
       if (announce){
           print(paste("flowClean detected too few cells in ",
-                      description(fF)$FILENAME, ".", sep=""))
+                      keyword(fF, "FILENAME")$FILENAME, ".", sep=""))
       }
       warning("Too few cells in FCS for flowClean.")
       GoodVsBad <- rep.int(0, times=nrow(fF))
@@ -140,7 +140,7 @@ clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, nCellCu
   else {
       if (announce){
           print(paste("flowClean detected no Time parameter in ",
-                      description(fF)$FILENAME, ".", sep=""))
+                      keyword(fF, "FILENAME")$FILENAME, ".", sep=""))
       }
       warning("No Time Parameter Detected")
       GoodVsBad <- rep.int(0, times=nrow(fF))
@@ -201,7 +201,7 @@ clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, nCellCu
     
     if (announce){
       print(paste("flowClean has identified problems in ",
-                  description(fF)$FILENAME, " with ", toString(bad),  ".", sep=""))
+                  keyword(fF, "FILENAME")$FILENAME, " with ", toString(bad),  ".", sep=""))
     }
     if (diagnostic){
       png(paste(filePrefixWithDir,sep=".", numbins, nCellCutoff,
@@ -222,7 +222,7 @@ clean <- function(fF, vectMarkers, filePrefixWithDir, ext, binSize=0.01, nCellCu
   else{
     if (announce){
         print(paste("flowClean detected no problems in ",
-                    description(fF)$FILENAME, ".", sep=""))
+                    keyword(fF, "FILENAME")$FILENAME, ".", sep=""))
     }
     if (diagnostic){
       png(paste(filePrefixWithDir,sep=".", numbins, nCellCutoff,
