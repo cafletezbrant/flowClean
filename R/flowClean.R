@@ -258,8 +258,9 @@ makeSeries <- function(vec){
 }
 
 fix.weird <- function(bad, weird, maxBin){
-    bad <- c(min(bad)-1, bad)
+    
     if(is.null(bad)){ return(weird) }
+    bad <- c(min(bad)-1, bad)
     ser.b <- makeSeries(bad)
     ser.w <- makeSeries(weird)
     ## fix persistent off-by-one error
